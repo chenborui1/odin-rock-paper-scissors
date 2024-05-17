@@ -1,35 +1,69 @@
-function playGame() {
-  let humanScore = 0;
-  let machineScore = 0;
+const human_score_display = document.querySelector(".human_score");
+const machine_score_display = document.querySelector(".machine_score");
+const announcement = document.querySelector(".announcement");
+const buttons = document.querySelectorAll("button");
 
-  for (let i = 0; i < 5; i++) {
-    const humanChoice = getHumanChoice();
+buttons.forEach((button) => {
+  button.addEventListener("click", () => {
     const machineChoice = getComputerChoice();
-    let result = playRound(humanChoice, machineChoice);
-    console.log(result);
-    if (result.includes("You Win!")) {
-      humanScore++;
-    } else if (result.includes("You Lose!")) {
-      machineScore++;
-    } else {
-      humanScore++;
-      machineScore++;
+    let humanChoice = "";
+    switch (button.textContent) {
+      case "Rock":
+        humanChoice = "Rock";
+        break;
+      case "Scissors":
+        humanChoice = "Scissors";
+        break;
+      case "Paper":
+        humanChoice = "Paper";
+        break;
+      case "Play Again":
+        humanChoice = "Play Again";
+        break;
+      default:
+        console.log("Invalid");
     }
-  }
+    if (humanChoice != "Play Again") {
+      let result = playRound(humanChoice, machineChoice);
+      if (result.includes("You Win!")) {
+        humanScore++;
+        human_score_display.textContent = humanScore;
+      } else if (result.includes("You Lose!")) {
+        machineScore++;
+        machine_score_display.textContent = machineScore;
+      }
 
-  if (humanScore > machineScore) {
-    return "Human wins with a score of " + humanScore;
-  } else if (humanScore < machineScore) {
-    return "Machine wins with a score of " + machineScore;
-  }
-  return (
-    "Tie Game! " +
-    "Human Score: " +
-    humanScore +
-    " Machine Score " +
-    machineScore
-  );
-}
+      if (humanScore == 5 || machineScore == 5) {
+        if (humanScore > machineScore) {
+          result = "You Win!";
+        } else {
+          result = "You Lose";
+        }
+        buttons.forEach((button) => {
+          if (button.textContent != "Play Again") {
+            button.disabled = true;
+          }
+        });
+      }
+      announcement.textContent = result;
+    }
+    else {
+      announcement.textContent = "";
+      humanScore = 0;
+      machineScore = 0;
+      human_score_display.textContent = humanScore;
+      machine_score_display.textContent = machineScore;
+      buttons.forEach((button) => {
+        if (button.textContent != "Play Again") {
+          button.disabled = false;
+        }
+      })
+    }
+  });
+});
+
+let humanScore = 0;
+let machineScore = 0;
 
 function getComputerChoice() {
   random = Math.random() * 3;
@@ -39,20 +73,6 @@ function getComputerChoice() {
     return "Paper";
   } else {
     return "Scissors";
-  }
-}
-
-function getHumanChoice() {
-  let choice = prompt("What is your choice?");
-  switch (choice.toLowerCase()) {
-    case "rock":
-      return "Rock";
-    case "paper":
-      return "Paper";
-    case "scissors":
-      return "Scissors";
-    default:
-      return "Invalid Choice";
   }
 }
 
@@ -74,8 +94,8 @@ function playRound(humanChoice, machineChoice) {
       Scissors: "Tie! Scissors ties Scissors",
     },
   };
-
-  return outcomes[humanChoice][machineChoice] || "Invalid input";
+  if (humanChoice == "Invalid Choice") {
+    return "Invalid input";
+  }
+  return outcomes[humanChoice][machineChoice];
 }
-
-console.log(playGame());
